@@ -78,7 +78,7 @@ else:
     subject = 'DSlife notification'
     body = '{0} new ads found for you!'.format(len(ads_found))
     
-    # send_mail(address, subject, body)
+    send_mail(address, subject, body)
 
 
 # Writing last check date
