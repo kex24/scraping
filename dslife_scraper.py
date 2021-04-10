@@ -13,6 +13,9 @@ from mailing import send_mail
 import re
 
 
+print('[{0}] Starting script: {1}'.format(
+    datetime.now().strftime('%d.%m.%Y %H:%M'),os.path.basename(__file__)))
+
 # Config
 url_base = 'https://www.bdsmlife.cz/inzeraty.htm?pg='
 tags = ['submisivního muže', 'switch muže', 'submisivní ženu nebo muže',
@@ -49,7 +52,8 @@ for p in range(1,pages+1):
     
     # Check ads
     for ad in ads:
-        ad_date = str(ad.findAll('div',{'class': 'datum new'})[0]).split(' - ')[1].split('<')[0]
+        ad_date = str(ad.findAll('div',{'class': 'datum new'})[0]).split(
+            ' - ')[1].split('<')[0]
         ad_date = datetime.strptime(ad_date, date_format)
         if ad_date > last_check:
             ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
@@ -66,8 +70,6 @@ for p in range(1,pages+1):
                     
                     ad = f'{ad_header}\n{ad_text}'
                     ads_found.append(ad)
-                    print()
-                    print(ad)
 
 
 # If nothing new
@@ -78,6 +80,8 @@ else:
     subject = 'DSlife notification'
     body = '{0} new ads found for you!'.format(len(ads_found))
     
+    print(body)
+    print('Sending mail ...')
     send_mail(address, subject, body)
 
 
@@ -85,4 +89,6 @@ else:
 date_file = open(check_file_path, 'w')
 date_file.write(datetime.now().strftime(date_format))
 date_file.close()
+
+print('FINISHED')
 
