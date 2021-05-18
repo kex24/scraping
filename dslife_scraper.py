@@ -11,35 +11,33 @@ from urllib.request import urlopen
 from datetime import datetime
 from mailing import send_mail
 import re
+import json
+import io
 
 
 print('[{0}] Starting script: {1}'.format(
     datetime.now().strftime('%d.%m.%Y %H:%M'),os.path.basename(__file__)))
 
 # Config
-url_base = 'https://www.bdsmlife.cz/inzeraty.htm?pg='
-tags = ['submisivního muže', 'switch muže', 'submisivní ženu nebo muže',
-        'switch ženu nebo muže']
-pages = 2
-date_format = '%d.%m.%Y %H:%M'
-check_file_path = 'dslife_scraper_last_check.txt'
+with io.open('config.json', 'r', encoding='UTF-8') as f:
+    CONFIG=json.loads(f.read())
 
 
 # Reading last check date
-if os.path.isfile(check_file_path):
-    date_file = open(check_file_path, 'r')
+if os.path.isfile(CONFIG['check_file_path']):
+    date_file = open(CONFIG['check_file_path'], 'r')
     last_check = date_file.read()
     date_file.close()
-    last_check = datetime.strptime(last_check, date_format)
+    last_check = datetime.strptime(last_check, CONFIG['date_format'])
 else:
     last_check = datetime(2000, 1, 1)
 
 
 # Main loop
 ads_found = []
-for p in range(1,pages+1):
+for p in range(1,CONFIG['pages']+1):
     # Load page
-    url = url_base + str(p)
+    url = CONFIG['url_base'] + str(p)
     webClient = urlopen(url)
     page = webClient.read()
     webClient.close()
@@ -54,10 +52,10 @@ for p in range(1,pages+1):
     for ad in ads:
         ad_date = str(ad.findAll('div',{'class': 'datum new'})[0]).split(
             ' - ')[1].split('<')[0]
-        ad_date = datetime.strptime(ad_date, date_format)
+        ad_date = datetime.strptime(ad_date, CONFIG['date_format'])
         if ad_date > last_check:
             ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
-            for tag in tags:
+            for tag in CONFIG['tags']:
                 if tag in ad_header:
                     ad_text = str(ad.findAll('div',{'class': 'txt'})[0])
                     
@@ -86,8 +84,8 @@ else:
 
 
 # Writing last check date
-date_file = open(check_file_path, 'w')
-date_file.write(datetime.now().strftime(date_format))
+date_file = open(CONFIG['check_file_path'], 'w')
+date_file.write(datetime.now().strftime(CONFIG['date_format']))
 date_file.close()
 
 print('FINISHED')
