@@ -26,11 +26,11 @@ with io.open('config.json', 'r', encoding='UTF-8') as f:
 # Reading last check date
 if os.path.isfile(CONFIG['check_file_path']):
     date_file = open(CONFIG['check_file_path'], 'r')
-    last_check = date_file.read()
+    last_ad_id = date_file.read()
     date_file.close()
-    last_check = datetime.strptime(last_check, CONFIG['date_format'])
+    last_ad_id = int(last_ad_id)
 else:
-    last_check = datetime(2000, 1, 1)
+    last_ad_id = 0
 
 
 # Main loop
@@ -49,11 +49,12 @@ for p in range(1,CONFIG['pages']+1):
     ads = page.findAll('div',{'class': 'inzerat'})
     
     # Check ads
+    ad_ids = []
     for ad in ads:
-        ad_date = str(ad.findAll('div',{'class': 'datum new'})[0]).split(
-            ' - ')[1].split('<')[0]
-        ad_date = datetime.strptime(ad_date, CONFIG['date_format'])
-        if ad_date > last_check:
+        ad_id = int(str(ad.findAll('div',{'class': 'number'})[0]).split(
+            '#')[1].split('<')[0])
+        ad_ids.append(ad_id)
+        if ad_id > last_ad_id:
             ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
             for tag in CONFIG['tags']:
                 if tag in ad_header:
@@ -85,7 +86,7 @@ else:
 
 # Writing last check date
 date_file = open(CONFIG['check_file_path'], 'w')
-date_file.write(datetime.now().strftime(CONFIG['date_format']))
+date_file.write(str(max(ad_ids)))
 date_file.close()
 
 print('FINISHED')

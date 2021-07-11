@@ -2,7 +2,6 @@
     "url_base": "https://www.bdsmlife.cz/inzeraty.htm?pg=",
     "tags": ["submisivního muže", "switch muže", "submisivní ženu nebo muže",
         "switch ženu nebo muže"],
-    "date_format": "%d.%m.%Y %H:%M",
     "pages": 2,
     "check_file_path": "dslife_lastcheck.txt"
 }
