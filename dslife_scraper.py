@@ -35,6 +35,7 @@ else:
 
 # Main loop
 ads_found = []
+ad_ids = []
 for p in range(1,CONFIG['pages']+1):
     # Load page
     url = CONFIG['url_base'] + str(p)
@@ -49,10 +50,10 @@ for p in range(1,CONFIG['pages']+1):
     ads = page.findAll('div',{'class': 'inzerat'})
     
     # Check ads
-    ad_ids = []
     for ad in ads:
         ad_id = int(str(ad.findAll('div',{'class': 'number'})[0]).split(
             '#')[1].split('<')[0])
+        print(ad_id)
         ad_ids.append(ad_id)
         if ad_id > last_ad_id:
             ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
