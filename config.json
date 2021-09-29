@@ -3,5 +3,6 @@
     "tags": ["submisivního muže", "switch muže", "submisivní ženu nebo muže",
         "switch ženu nebo muže"],
     "pages": 2,
-    "check_file_path": "dslife_lastcheck.txt"
+    "check_file_path": "dslife_lastcheck.txt",
+    "debug": false
 }

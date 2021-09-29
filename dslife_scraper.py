@@ -31,7 +31,8 @@ if os.path.isfile(CONFIG['check_file_path']):
     last_ad_id = int(last_ad_id)
 else:
     last_ad_id = 0
-
+if CONFIG['debug']:
+    print(f'Last ad ID was: {last_ad_id}')
 
 # Main loop
 ads_found = []
@@ -51,14 +52,27 @@ for p in range(1,CONFIG['pages']+1):
     
     # Check ads
     for ad in ads:
+        # Print ad for debuging
+        if CONFIG['debug']:
+            print()
+            print(ad)
+            print()
+        
+        # Parse as ID
         ad_id = int(str(ad.findAll('div',{'class': 'number'})[0]).split(
             '#')[1].split('<')[0])
-        print(ad_id)
         ad_ids.append(ad_id)
+        
+        # Check if the ad is new
         if ad_id > last_ad_id:
+            
+            # Parse header
             ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
             for tag in CONFIG['tags']:
+                
+                # Check tag
                 if tag in ad_header:
+                    
                     ad_text = str(ad.findAll('div',{'class': 'txt'})[0])
                     
                     to_omit = ['<div class="typ">', '<span class="kraj">',
@@ -70,6 +84,8 @@ for p in range(1,CONFIG['pages']+1):
                     
                     ad = f'{ad_header}\n{ad_text}'
                     ads_found.append(ad)
+                    if CONFIG['debug']:
+                        print(f'Ad {ad_id} appended')
 
 
 # If nothing new
