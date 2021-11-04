@@ -4,5 +4,6 @@
         "switch ženu nebo muže"],
     "pages": 2,
     "check_file_path": "dslife_lastcheck.txt",
-    "debug": false
+    "debug": false,
+    "mailto": "kex24@protonmail.com"
 }

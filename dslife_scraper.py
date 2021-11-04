@@ -28,7 +28,10 @@ if os.path.isfile(CONFIG['check_file_path']):
     date_file = open(CONFIG['check_file_path'], 'r')
     last_ad_id = date_file.read()
     date_file.close()
-    last_ad_id = int(last_ad_id)
+    if last_ad_id != '':
+        last_ad_id = int(last_ad_id)
+    else:
+        last_ad_id = 0
 else:
     last_ad_id = 0
 if CONFIG['debug']:
@@ -48,7 +51,7 @@ for p in range(1,CONFIG['pages']+1):
     page = soup(page, 'html.parser')
     
     # Find ads
-    ads = page.findAll('div',{'class': 'inzerat'})
+    ads = page.findAll('div',{'class': 'ad'})
     
     # Check ads
     for ad in ads:
@@ -59,27 +62,29 @@ for p in range(1,CONFIG['pages']+1):
             print()
         
         # Parse as ID
-        ad_id = int(str(ad.findAll('div',{'class': 'number'})[0]).split(
-            '#')[1].split('<')[0])
+        ad_id = int(str(ad.findAll('div',{'class': 'links'})[0]).split(
+            "id=")[1].split('\'')[0])
         ad_ids.append(ad_id)
         
         # Check if the ad is new
         if ad_id > last_ad_id:
             
             # Parse header
-            ad_header = str(ad.findAll('div',{'class': 'typ'})[0])
+            ad_header = str(ad.findAll('div',{'class': 'title'})[0])
             for tag in CONFIG['tags']:
                 
                 # Check tag
                 if tag in ad_header:
                     
-                    ad_text = str(ad.findAll('div',{'class': 'txt'})[0])
+                    ad_text = str(ad.findAll('div',{'class': 'body'})[0])
                     
-                    to_omit = ['<div class="typ">', '<span class="kraj">',
-                               '</span>', '</div>', '<div class="txt">']
+                    to_omit = ['<div class="body">', '\n', '<div class="title">',
+                               '<b>', '</b>', '<br/>']
                     for subs in to_omit:
                         ad_header = re.sub(r'{0}'.format(subs), '', ad_header)
                         ad_text = re.sub(r'{0}'.format(subs), '', ad_text)
+                    
+                    ad_text = ad_text.split('\r')[0]
                     
                     
                     ad = f'{ad_header}\n{ad_text}'
@@ -92,7 +97,7 @@ for p in range(1,CONFIG['pages']+1):
 if len(ads_found) == 0:
     print('No new ads')
 else:
-    address = 'mrt.sevcik@gmail.com'
+    address = CONFIG['mailto']
     subject = 'DSlife notification'
     body = '{0} new ads found for you!'.format(len(ads_found))
     
